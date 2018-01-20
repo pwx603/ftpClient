@@ -4,16 +4,40 @@ import java.net.*;
 public class CSftp {
     public static void main(String[] args) throws IOException {
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("csftp> ");
 
+        String hostName = args[0];
+        int portNumber = Integer.parseInt(args[1]);
 
-        String hostName = userInput.readLine();
-        int portNumber = Integer.parseInt(hostName);
 
         try (
                 Socket kkSocket = new Socket(hostName, portNumber);
                 PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()))
+        ) {
+            System.out.println("Connection sucessfully established");
+
+        } catch (UnknownHostException e) {
+            System.err.println("Don't know about host " + hostName);
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("Couldn't get I/O for the connection to " +
+                    hostName);
+            System.exit(1);
+        }
+
+        while(true){
+            System.out.print("csftp> ");
+            String command = userInput.readLine();
+            System.out.println(command);
+
+        }
+
+        /*
+        try (
+                Socket kkSocket = new Socket(hostName, portNumber);
+                PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(kkSocket.getInputStream()));
         ) {
             BufferedReader stdIn =
                     new BufferedReader(new InputStreamReader(System.in));
@@ -39,7 +63,7 @@ public class CSftp {
                 if (fromUser != null) {
                     System.out.println("Client: " + fromUser);
                     out.println(fromUser);
-                }*/
+                }
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
@@ -49,5 +73,6 @@ public class CSftp {
                     hostName);
             System.exit(1);
         }
+        */
     }
 }
