@@ -1,19 +1,19 @@
 import java.io.*;
 import java.net.*;
 
-public class FTPClient {
-    public static void main() throws IOException {
+public class CSftp {
+    public static void main(String[] args) throws IOException {
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("csftp> ");
 
+
         String hostName = userInput.readLine();
-        int portNumber = Integer.parseInt(args[1]);
+        int portNumber = Integer.parseInt(hostName);
 
         try (
                 Socket kkSocket = new Socket(hostName, portNumber);
                 PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(kkSocket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()))
         ) {
             BufferedReader stdIn =
                     new BufferedReader(new InputStreamReader(System.in));
