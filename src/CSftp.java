@@ -33,14 +33,20 @@ public class CSftp {
                     return;
                 }*/
                 String command = userInput.readLine();
-                String [] splitCommands = command.split("\\s");
+                String[] splitCommands = command.split("\\s");
+
                 if(splitCommands.length == 2){
-                    if(splitCommands[0] == "user" && !(splitCommands[1].isEmpty())){
+                    if(splitCommands[0].equals("user")){
                         out.println("USER "+splitCommands[1]);
                     }
                 }
+                //Todo: This doesn't work yet
+                serverResponse = in.readLine();
+                while(serverResponse.equals("230-\\.")){
+                    System.out.println(serverResponse);
+                    serverResponse = in.readLine();
+                }
 
-                System.out.println(in.readLine());
 
             }
 
