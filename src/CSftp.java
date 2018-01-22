@@ -22,37 +22,38 @@ public class CSftp {
              PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()))
         ) {
-            
-            printResponse(in);
+
+            printResponse(in); // Prints response from server after connection
             String serverResponse;
             while(true){
+                // Listens to client
                 System.out.print("csftp> ");
                 String command = userInput.readLine();
-                String[] splitCommands = command.split("\\s", 2);
+                String[] splitCommands = command.split("\\s", 2);   // Assumes command has at most 2 args
                 String commandArg1 = splitCommands[0];
                 if(splitCommands.length == 2){
 
                     String commandArg2 = splitCommands[1];
-                    if(needPass){
+                    if(needPass){   // If needs password from response code of 331
                         if(commandArg1.equals("pw")){
-                            out.println("PASS "+commandArg2);
+                            out.println("PASS "+commandArg2); // Sends out the password
                         }
                     }else{
                         switch(commandArg1.toLowerCase()){
                             case "user":
-                                out.println("USER "+commandArg2);
+                                out.println("USER "+commandArg2); // tries to login with user, listens for response outside of loop
                                 break;
                             case "pw":
                                 if(needPass){
-                                    out.println("PASS "+commandArg2);
+                                    out.println("PASS "+commandArg2); // gets password if needs password
                                 }else{
-                                    System.out.println("0x001 Invalid command");
+                                    System.out.println("0x001 Invalid command"); // password command is invalid
                                     System.exit(1);
                                     return;
                                 }
                                 break;
                             case "get":
-                                getCommand(out, in , commandArg2);
+                                getCommand(out, in , commandArg2); // sends one command, listens/prints from server, sends another
                                 break;
                         }
                     }
@@ -71,14 +72,14 @@ public class CSftp {
     }
 
 
-    // Switches to passive mode and also retrieves data
+    // Switches to passive mode, waits for response and also retrieves data
     public static void getCommand(PrintWriter out, BufferedReader in, String commandArg2) throws IOException{
         out.println("PASV");
         printResponse(in);
         out.println("RETR "+commandArg2);
     }
 
-    // prints and waits for the response from the server
+    // prints the response from the server
     public static void printResponse(BufferedReader in) throws IOException {
         String serverResponse = in.readLine();
         while(serverResponse.matches("\\d\\d\\d-(.*)")){    //Checks for response code, matches digit digit digit
