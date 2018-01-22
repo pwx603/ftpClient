@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.*;
 
 public class CSftp {
+    public static Boolean needPass = false;
     public static void main(String[] args) throws IOException {
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         String hostName = args[0];;
@@ -33,21 +34,37 @@ public class CSftp {
                     return;
                 }*/
                 String command = userInput.readLine();
-                String[] splitCommands = command.split("\\s");
-
+                String[] splitCommands = command.split("\\s", 2);
+                String commandArg1 = splitCommands[0];
                 if(splitCommands.length == 2){
-                    if(splitCommands[0].equals("user")){
-                        out.println("USER "+splitCommands[1]);
+
+                    String commandArg2 = splitCommands[1];
+                    if(needPass){
+                        if(commandArg1.equals("pw")){
+                            out.println("PASS "+commandArg2);
+                        }
+                    }else{
+                        switch(commandArg1.toLowerCase()){
+                            case "user":
+                                out.println("USER "+commandArg2);
+                                break;
+                            case "pw":
+                                if(needPass){
+                                    out.println("PASS "+commandArg2);
+                                }else{
+                                    System.out.println("0x001 Invalid command");
+                                    System.exit(1);
+                                    return;
+                                }
+                                break;
+                            case "get":
+                                getCommand(out, in , commandArg2);
+                                break;
+                        }
                     }
-                }
-                //Todo: This doesn't work yet
-                serverResponse = in.readLine();
-                while(serverResponse.equals("230-\\.")){
-                    System.out.println(serverResponse);
-                    serverResponse = in.readLine();
-                }
+                    printResponse(in);
 
-
+                }
             }
 
         } catch (UnknownHostException e) {
@@ -57,50 +74,25 @@ public class CSftp {
             System.err.println("0xFFFD Control connection I/O error, closing control connection ");
             System.exit(1);
         }
+    }
 
 
+    // Switches to passive mode and also retrieves data
+    public static void getCommand(PrintWriter out, BufferedReader in, String commandArg2) throws IOException{
+        out.println("PASV");
+        printResponse(in);
+        out.println("RETR "+commandArg2);
+    }
 
-        /*
-        try (
-                Socket kkSocket = new Socket(hostName, portNumber);
-                PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(kkSocket.getInputStream()));
-        ) {
-            BufferedReader stdIn =
-                    new BufferedReader(new InputStreamReader(System.in));
-            String fromServer;
-            String fromUser;
-
-            int x = 10;
-            while ((fromServer = in.readLine()) != null && (x > 0)) {
-                System.out.println("Server: " + fromServer);
-                if (fromServer.equals("Bye."))
-                    break;
-
-                fromUser = "Who's there?";
-                System.out.println("Client: " + fromUser);
-                out.println(fromUser);
-                x--;
-                //fromUser = stdIn.readLine();
-                /*if(fromUser == null){
-                    fromUser = "Who's there?";
-                    System.out.println("Client: " + fromUser);
-                    out.println(fromUser);
-                }else
-                if (fromUser != null) {
-                    System.out.println("Client: " + fromUser);
-                    out.println(fromUser);
-                }
-            }
-        } catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + hostName);
-            System.exit(1);
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to " +
-                    hostName);
-            System.exit(1);
+    // prints and waits for the response from the server
+    public static void printResponse(BufferedReader in) throws IOException {
+        String serverResponse = in.readLine();
+        while(serverResponse.matches("\\d\\d\\d-(.*)")){    //Checks for response code, matches digit digit digit
+            if(serverResponse.contains("331"))
+                needPass = true;
+            System.out.println(serverResponse);
+            serverResponse = in.readLine();
         }
-        */
+        System.out.println(serverResponse);
     }
 }
