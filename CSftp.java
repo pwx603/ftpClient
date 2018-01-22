@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
 
+import java.util.Arrays;
+
 public class CSftp {
     public static void main(String[] args) throws IOException {
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
@@ -27,8 +29,8 @@ public class CSftp {
 
         while(true){
             System.out.print("csftp> ");
-            String command = userInput.readLine();
-            System.out.println(command);
+            String[] commands = userInput.readLine().split(" ");
+            System.out.println(Arrays.toString(command));
 
         }
 
