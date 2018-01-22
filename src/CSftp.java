@@ -22,17 +22,11 @@ public class CSftp {
              PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()))
         ) {
-
-            System.out.println(in.readLine());
+            
+            printResponse(in);
             String serverResponse;
             while(true){
                 System.out.print("csftp> ");
-                //serverResponse = in.readLine();
-                /*if(serverResponse == "\\421\\s"){
-                    System.out.println(serverResponse);
-                    System.exit(1);
-                    return;
-                }*/
                 String command = userInput.readLine();
                 String[] splitCommands = command.split("\\s", 2);
                 String commandArg1 = splitCommands[0];
@@ -88,11 +82,11 @@ public class CSftp {
     public static void printResponse(BufferedReader in) throws IOException {
         String serverResponse = in.readLine();
         while(serverResponse.matches("\\d\\d\\d-(.*)")){    //Checks for response code, matches digit digit digit
-            if(serverResponse.contains("331"))
-                needPass = true;
             System.out.println(serverResponse);
             serverResponse = in.readLine();
         }
+        if(serverResponse.contains("331 "))
+            needPass = true;
         System.out.println(serverResponse);
     }
 }
