@@ -31,6 +31,7 @@ public class CSftp {
                 String command = userInput.readLine();
                 String[] splitCommands = command.split("\\s", 2);   // Assumes command has at most 2 args
                 String commandArg1 = splitCommands[0];
+
                 if(splitCommands.length == 2){
 
                     String commandArg2 = splitCommands[1];
@@ -55,6 +56,8 @@ public class CSftp {
                             case "get":
                                 getCommand(out, in , commandArg2); // sends one command, listens/prints from server, sends another
                                 break;
+                            default:
+                                System.out.println("0x001 Invalid command");
                         }
                     }
                     printResponse(in);
