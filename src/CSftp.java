@@ -54,9 +54,9 @@ public class CSftp {
                                 break;
                             case "get":
                                 getCommand(out, in , commandArg2); // sends one command, listens/prints from server, sends another
-                                break;
                         }
                     }
+                    System.out.println("finish transfer");
                     printResponse(in);
 
                 }
@@ -75,19 +75,52 @@ public class CSftp {
     // Switches to passive mode, waits for response and also retrieves data
     public static void getCommand(PrintWriter out, BufferedReader in, String commandArg2) throws IOException{
         out.println("PASV");
-        printResponse(in);
-        out.println("RETR "+commandArg2);
+        String response = printResponse(in);
+
+        String[] splitArray = response.split("\\(" );
+        splitArray = splitArray[1].split("\\)");
+        splitArray = splitArray[0].split(",");
+
+        String newHost = splitArray[0]+"."+splitArray[1]+"."+splitArray[2]+"."+splitArray[3];
+        Integer newPort = Integer.parseInt(splitArray[4])*256 + Integer.parseInt(splitArray[5]);
+        try(Socket dataSocket = new Socket(newHost, newPort)) {
+            out.println("RETR "+commandArg2);
+        }catch (UnknownHostException e) {
+            System.err.println("0x3A2 Data transfer connection to "+newHost+" on port "+newPort+" failed to open");
+            return;
+        } catch (IOException e) {
+            System.err.println("0x3A7 Data transfer connection I/O error, closing data connection.");
+            return;
+        }
+
+
     }
 
     // prints the response from the server
-    public static void printResponse(BufferedReader in) throws IOException {
+    public static String printResponse(BufferedReader in) throws IOException {
         String serverResponse = in.readLine();
         while(serverResponse.matches("\\d\\d\\d-(.*)")){    //Checks for response code, matches digit digit digit
             System.out.println(serverResponse);
             serverResponse = in.readLine();
         }
-        if(serverResponse.contains("331 "))
-            needPass = true;
         System.out.println(serverResponse);
+        if(serverResponse.matches("")){
+            System.out.println("second finish transfer");
+            String temp = "";
+            return temp;
+        }else
+        if(serverResponse.contains("331 ")){
+            needPass = true;
+            String temp = "";
+            return temp;
+        }else
+
+        if(serverResponse.contains("227 ")){
+            return serverResponse;
+        }else if(serverResponse.contains("150 ")) {
+            return printResponse(in);
+        }
+        String temp = "";
+        return temp;
     }
 }
