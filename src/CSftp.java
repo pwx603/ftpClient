@@ -38,6 +38,10 @@ public class CSftp {
                     if(needPass){   // If needs password from response code of 331
                         if(commandArg1.equals("pw")){
                             out.println("PASS "+commandArg2); // Sends out the password
+                        }else {
+                            System.out.println("0x001 Invalid command");
+                            System.exit(1);
+                            return;
                         }
                     }else{
                         switch(commandArg1.toLowerCase()){
@@ -58,10 +62,11 @@ public class CSftp {
                                 break;
                             default:
                                 System.out.println("0x001 Invalid command");
+                                System.exit(1);
+                                return;
 
                         }
                     }
-                    System.out.println("finish transfer");
                     printResponse(in);
 
                 }
@@ -88,8 +93,12 @@ public class CSftp {
 
         String newHost = splitArray[0]+"."+splitArray[1]+"."+splitArray[2]+"."+splitArray[3];
         Integer newPort = Integer.parseInt(splitArray[4])*256 + Integer.parseInt(splitArray[5]);
-        try(Socket dataSocket = new Socket(newHost, newPort)) {
+        try(
+                Socket dataSocket = new Socket(newHost, newPort);
+                BufferedReader newIn = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()))
+        ) {
             out.println("RETR "+commandArg2);
+            printSecondServer(newIn);
         }catch (UnknownHostException e) {
             System.err.println("0x3A2 Data transfer connection to "+newHost+" on port "+newPort+" failed to open");
             return;
@@ -110,7 +119,6 @@ public class CSftp {
         }
         System.out.println(serverResponse);
         if(serverResponse.matches("")){
-            System.out.println("second finish transfer");
             String temp = "";
             return temp;
         }else
@@ -124,6 +132,32 @@ public class CSftp {
             return serverResponse;
         }else if(serverResponse.contains("150 ")) {
             return printResponse(in);
+        }
+        String temp = "";
+        return temp;
+    }
+
+    public static String printSecondServer(BufferedReader in) throws IOException {
+        String serverResponse = in.readLine();
+
+        Boolean hasWhiteSpace = false;
+        while(!(serverResponse.matches("\\s+")) && serverResponse != null){
+            if(serverResponse.matches("\\s+")){
+                if(!hasWhiteSpace){
+
+                    hasWhiteSpace = true;
+                }else{
+                    String temp = "";
+                    return temp;
+                }
+            }else{
+                if(hasWhiteSpace)
+                    hasWhiteSpace = false;
+
+            }
+
+            System.out.println(serverResponse);
+            serverResponse = in.readLine();
         }
         String temp = "";
         return temp;
