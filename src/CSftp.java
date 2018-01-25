@@ -141,7 +141,7 @@ public class CSftp {
         String serverResponse = in.readLine();
 
         Boolean hasWhiteSpace = false;
-        while(!(serverResponse.matches("\\s+")) && serverResponse != null){
+        while(serverResponse != null && !(serverResponse.matches("\\s+"))){
             if(serverResponse.matches("\\s+")){
                 if(!hasWhiteSpace){
 
