@@ -38,6 +38,7 @@ public class CSftp {
                     if(needPass){   // If needs password from response code of 331
                         if(commandArg1.equals("pw")){
                             out.println("PASS "+commandArg2); // Sends out the password
+                            needPass = false;
                         }else {
                             System.out.println("0x001 Invalid command");
                             System.exit(1);
@@ -51,6 +52,7 @@ public class CSftp {
                             case "pw":
                                 if(needPass){
                                     out.println("PASS "+commandArg2); // gets password if needs password
+                                    needPass = false;
                                 }else{
                                     System.out.println("0x001 Invalid command"); // password command is invalid
                                     System.exit(1);
@@ -95,9 +97,12 @@ public class CSftp {
         Integer newPort = Integer.parseInt(splitArray[4])*256 + Integer.parseInt(splitArray[5]);
         try(
                 Socket dataSocket = new Socket(newHost, newPort);
-                BufferedReader newIn = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()))
+                BufferedReader newIn = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
+                InputStream fileIn = dataSocket.getInputStream();
         ) {
             out.println("RETR "+commandArg2);
+
+            fileTransfer(fileIn, commandArg2);
             printSecondServer(newIn);
         }catch (UnknownHostException e) {
             System.err.println("0x3A2 Data transfer connection to "+newHost+" on port "+newPort+" failed to open");
@@ -109,6 +114,7 @@ public class CSftp {
 
 
     }
+
 
     // prints the response from the server
     public static String printResponse(BufferedReader in) throws IOException {
@@ -135,6 +141,18 @@ public class CSftp {
         }
         String temp = "";
         return temp;
+    }
+
+    // writes the response from the server into a file
+    public static void fileTransfer(InputStream in, String fileName) throws IOException {
+        int fileResponse = in.read();
+        byte[] bytes = new byte[1024];
+        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+        while(fileResponse != -1){
+            fileOutputStream.write(fileResponse);
+            fileResponse = in.read();
+        }
+        System.out.println("finished writing");
     }
 
     public static String printSecondServer(BufferedReader in) throws IOException {
