@@ -11,11 +11,23 @@ public class FtpProtocol {
         		output = handleTwoArgs(commandArgs);
         		break;
         	default:
-        		output = " ";
+        		if (validCom(commandArgs)){
+        		    output = " ";
+
+                } else {
+                    output = "";
+                }
         		break;
         }
         
         return output;
+    }
+    private static Boolean validCom(String[] commandArgs){
+        if(commandArgs[0].equalsIgnoreCase("quit")|| commandArgs[0].equalsIgnoreCase("features")|| commandArgs[0].equalsIgnoreCase("dir")||
+                commandArgs[0].equalsIgnoreCase("user")|| commandArgs[0].equalsIgnoreCase("pw")||commandArgs[0].equalsIgnoreCase("get")||
+                commandArgs[0].equalsIgnoreCase("cd")){
+                return true;
+        }else return false;
     }
     
     private static String handleOneArg(String[] commandArgs){
@@ -26,9 +38,9 @@ public class FtpProtocol {
     	}else if(commandArgs[0].equalsIgnoreCase("dir")){
     		return "PASV LIST";
     	}else if(commandArgs[0].equalsIgnoreCase("user") || (commandArgs[0].equalsIgnoreCase("pw")) ||
-                (commandArgs[0].equalsIgnoreCase("get")) || (commandArgs[0].equalsIgnoreCase("cd")) ||
-                (commandArgs[0].equalsIgnoreCase("retr"))){
+                (commandArgs[0].equalsIgnoreCase("get")) || (commandArgs[0].equalsIgnoreCase("cd"))){
 
+            System.out.println("Wtf 1");
     	    return " ";
         }else{
             return "";
@@ -44,14 +56,14 @@ public class FtpProtocol {
     		return "PASV RETR " + commandArgs[1];
     	}else if(commandArgs[0].equalsIgnoreCase("cd")) {
     		return "CWD " + commandArgs[1];
-    	}else if(commandArgs[0].equalsIgnoreCase("retr")){
-    		return "RETR " + commandArgs[1];
     	}else if(commandArgs[0].equalsIgnoreCase("quit") || (commandArgs[0].equalsIgnoreCase("features")) ||
                 (commandArgs[0].equalsIgnoreCase("dir"))){
 
+    	    System.out.println("Wtf");
             return " ";
 
         }else{
+
             return "";
         }
     }

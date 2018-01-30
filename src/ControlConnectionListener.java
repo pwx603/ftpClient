@@ -27,10 +27,16 @@ public class ControlConnectionListener extends Thread{
 		        //System.out.println("buffer not null");
                 while((output=in.readLine())!=null){
                    // System.out.println("stream available");
-                    listenerHasLock = true;
+                    if(output.contains("421")) {
+                        System.out.println("\n" + output);
+                        System.exit(1);
+                    }
                     System.out.println(output);
+
+                    // Bad code, remember to fix this using regex
     				if(output.contains("220 ") || output.contains("226 ") || output.contains("230 ") || output.contains("250 ")
-                            || output.contains("211 End")){
+                            || output.contains("211 End") || output.contains("331 ") || output.contains("530 ")
+                            || output.contains("503 ")){
 
                         System.out.print("csftp> ");
 

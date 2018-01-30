@@ -51,6 +51,11 @@ public class ControlConnection extends ClientConnection {
 
 					command = FtpProtocol.processCommand(inputLine);
                    // System.out.println("Command translated: "+command);
+                    if(inputLine.equals("")||inputLine.charAt(0)=='#') {
+                        System.out.print("csftp> ");
+                        continue;
+
+                    }
                     ccListener.updateCommand(command);
                     //System.out.println("Command translated updated: "+command);
                     if(command.equals(" ")){
