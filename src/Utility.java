@@ -13,4 +13,12 @@ public class Utility {
 
         return adr;
     }
+    
+    public static void echoClient(String str) {
+    	System.out.println("--> " + str); 
+    }
+    
+    public static void echoServer(String str) {
+    	System.out.println("<-- " + str); 
+    }
 }

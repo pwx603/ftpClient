@@ -1,8 +1,12 @@
-public class FtpProtocol {
-    public static String processCommand(String input){
-        String output = "";
-        String[] commandArgs = input.split(" ");
 
+public class FtpProtocol {
+	private FtpProtocol () {		
+	}
+	
+	public static String processCommand(String input){
+        String output = "";
+        String[] commandArgs = input.split("\\s+");
+        
         switch(commandArgs.length) {
         	case 1:
         		output = handleOneArg(commandArgs);
@@ -11,23 +15,11 @@ public class FtpProtocol {
         		output = handleTwoArgs(commandArgs);
         		break;
         	default:
-        		if (validCom(commandArgs)){
-        		    output = " ";
-
-                } else {
-                    output = "";
-                }
+        		System.out.println("0x002 Invalid number of arguments");
         		break;
         }
         
         return output;
-    }
-    private static Boolean validCom(String[] commandArgs){
-        if(commandArgs[0].equalsIgnoreCase("quit")|| commandArgs[0].equalsIgnoreCase("features")|| commandArgs[0].equalsIgnoreCase("dir")||
-                commandArgs[0].equalsIgnoreCase("user")|| commandArgs[0].equalsIgnoreCase("pw")||commandArgs[0].equalsIgnoreCase("get")||
-                commandArgs[0].equalsIgnoreCase("cd")){
-                return true;
-        }else return false;
     }
     
     private static String handleOneArg(String[] commandArgs){
@@ -37,14 +29,10 @@ public class FtpProtocol {
     		return "FEAT";
     	}else if(commandArgs[0].equalsIgnoreCase("dir")){
     		return "PASV LIST";
-    	}else if(commandArgs[0].equalsIgnoreCase("user") || (commandArgs[0].equalsIgnoreCase("pw")) ||
-                (commandArgs[0].equalsIgnoreCase("get")) || (commandArgs[0].equalsIgnoreCase("cd"))){
-
-            System.out.println("Wtf 1");
-    	    return " ";
-        }else{
-            return "";
-        }
+    	}else if(commandArgs[0].equalsIgnoreCase("")) {
+    		return "";
+    	}
+    	return "";
     }
     
     private static String handleTwoArgs(String[] commandArgs) {
@@ -56,17 +44,10 @@ public class FtpProtocol {
     		return "PASV RETR " + commandArgs[1];
     	}else if(commandArgs[0].equalsIgnoreCase("cd")) {
     		return "CWD " + commandArgs[1];
-    	}else if(commandArgs[0].equalsIgnoreCase("quit") || (commandArgs[0].equalsIgnoreCase("features")) ||
-                (commandArgs[0].equalsIgnoreCase("dir"))){
-
-    	    System.out.println("Wtf");
-            return " ";
-
-        }else{
-
-            return "";
-        }
+    	}else if(commandArgs[0].equalsIgnoreCase("retr")){
+    		return "RETR " + commandArgs[1];
+    	}
+    	return "";
     }
-    
 
 }

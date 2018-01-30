@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,10 +8,11 @@ public class CSftp {
 	private static String hostName;
 	private static int portNumber;
 	private static BufferedReader stdIn;
-	private static boolean retrMode = false;
-	private static String retrFileName;
-
+	private volatile static boolean retrMode = false;
+	private volatile static String retrFileName;
+	volatile static boolean inTransfer = false;
 	public static void main(String[] args) {
+		
 		hostName = args[0];
 		portNumber = Integer.parseInt(args[1]);
 		stdIn = new BufferedReader(
@@ -24,22 +24,21 @@ public class CSftp {
 				new ControlConnection(hostName, defaultPort).start();
 				break;
 			case 2:
+				
 				new ControlConnection(hostName, portNumber).start();
 				break;
 			default:
-				System.err.println("0xFFFF Processing error. Expected hostName and portNumber, but found >2 arguments");
+				System.err.println("0xFFFF Processing error. Expected hostName and portNumber, but found > 2 or 0 arguments");
 				System.exit(1);
-				return;
 			}
 						
 		}catch(UnknownHostException e){
-			System.err.println("0xFFFC Control connection to "+hostName+" on port "+portNumber+" failed to open.");
-            System.exit(1);
-            return;
+			System.err.println("0xFFFC Control connection to "
+					+ hostName+" on port "+ portNumber +" failed to open.");
+            System.exit(1);	
 		}catch(IOException e){
 			System.err.println("0xFFFD Control connection I/O error, closing control connection.");
 			System.exit(1);
-			return;
 		}
 
 	}
@@ -69,4 +68,3 @@ public class CSftp {
 	}
 
 }
-
